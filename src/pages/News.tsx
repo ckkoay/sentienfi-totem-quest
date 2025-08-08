@@ -12,9 +12,12 @@ const useSEO = (title: string, desc: string) => {
 };
 
 const News = () => {
-  useSEO("Crypto News Scanner – SentienFi", "Tailored crypto news summaries and links based on your archetype.");
   const [params] = useSearchParams();
   const archetype = params.get("archetype") || "";
+  useSEO(
+    archetype ? `News Summary for ${archetype} – SentienFi` : "Crypto News Scanner – SentienFi",
+    "Tailored crypto news summaries and links based on your archetype."
+  );
 
   return (
     <div className="min-h-screen bg-gradient-primary flex flex-col">

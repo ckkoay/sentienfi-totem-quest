@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
 import { ApiKeyModal } from "./ApiKeyModal";
 import { fetchNews, summarizeUrl, getPerplexityApiKey, type TimeRange, type NewsResult } from "@/services/perplexity";
-
+import { format } from "date-fns";
 const CACHE_PREFIX = "news_cache_v1:";
 const TTL_MS = 10 * 60 * 1000; // 10 minutes
 
@@ -39,6 +39,8 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
   const [urlLoading, setUrlLoading] = useState(false);
 
   const apiKeyPresent = !!getPerplexityApiKey();
+
+  const curatedAt = useMemo(() => format(new Date(), "HH:mm dd-MMM-yy"), []);
 
   const cacheKey = useMemo(() => {
     const topics = topicsText
@@ -111,7 +113,8 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
     <section aria-labelledby="news-heading" className="mt-4">
       <Card>
         <CardHeader>
-          <CardTitle id="news-heading">Crypto news scanner</CardTitle>
+          <CardTitle id="news-heading">News Summary for {archetype}</CardTitle>
+          <p className="text-sm text-muted-foreground">Curated at {curatedAt}</p>
         </CardHeader>
         <CardContent className="grid gap-4">
           {!apiKeyPresent && (

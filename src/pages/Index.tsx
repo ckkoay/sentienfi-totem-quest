@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { ArchetypeGuide } from "@/components/ArchetypeGuide";
-
+import { NewsPanel } from "@/components/NewsPanel";
 // SEO
 const useSEO = () => {
   useEffect(() => {
@@ -394,7 +394,10 @@ const Index = () => {
               )}
 
               {archetype && (
-                <ArchetypeGuide archetype={archetype} />
+                <>
+                  <ArchetypeGuide archetype={archetype} />
+                  <NewsPanel archetype={archetype} />
+                </>
               )}
               <div className="grid gap-2 sm:grid-cols-2">
                 <Button onClick={() => {

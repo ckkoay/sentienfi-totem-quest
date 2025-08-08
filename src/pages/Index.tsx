@@ -390,14 +390,6 @@ const Index = () => {
                       ))}
                     </ul>
                   </div>
-                  <div>
-                    <h3 className="font-semibold">What to consider</h3>
-                    <ul className="list-disc pl-5 text-muted-foreground">
-                      {ARCHETYPES[archetype].suggestions.map((s, i) => (
-                        <li key={i}>{s}</li>
-                      ))}
-                    </ul>
-                  </div>
                 </div>
               )}
 

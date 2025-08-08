@@ -20,7 +20,7 @@ const RECS: Record<string, { strategies: string[]; resources: { label: string; h
   },
   Builder: {
     strategies: [
-      "DCA into quality (e.g., BTC/ETH + top projects).",
+      "Invest a fixed amount regularly (dollar‑cost averaging, DCA) into quality assets (e.g., BTC/ETH + top projects).",
       "Rebalance by rules (e.g., quarterly or on 5–10% drift).",
       "Stake where reliable; prefer audited, battle‑tested options.",
       "Keep a stablecoin buffer for life needs and buying dips.",
@@ -59,9 +59,9 @@ const RECS: Record<string, { strategies: string[]; resources: { label: string; h
   },
   Dreamer: {
     strategies: [
-      "Build simple thematic baskets (AI, DePIN, L2s, etc.).",
+      "Build simple thematic baskets (AI, DePIN—decentralized physical infrastructure networks—and L2s—Layer‑2 networks).",
       "Write a short thesis; review quarterly and prune weak ideas.",
-      "Use DCA + alerts instead of constant chart‑watching.",
+      "Use dollar‑cost averaging (DCA) + price alerts instead of constant chart‑watching.",
       "Keep a core long‑term spot stack; avoid over‑trading.",
     ],
     resources: [

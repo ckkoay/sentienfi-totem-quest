@@ -111,3 +111,4 @@ All colors MUST be HSL.
   .story-link { @apply relative inline-block; }
   .story-link::after { content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: hsl(var(--primary)); transform: scaleX(0); transform-origin: bottom right; transition: transform .3s; }
   .story-link:hover::after { transform: scaleX(1); transform-origin: bottom left; }
+}

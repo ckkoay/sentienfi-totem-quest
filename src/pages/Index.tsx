@@ -11,6 +11,7 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
+import { ArchetypeGuide } from "@/components/ArchetypeGuide";
 
 // SEO
 const useSEO = () => {
@@ -382,6 +383,9 @@ const Index = () => {
                 </div>
               )}
 
+              {archetype && (
+                <ArchetypeGuide archetype={archetype} />
+              )}
               <div className="grid gap-2 sm:grid-cols-2">
                 <Button onClick={() => {
                   setStep(0);

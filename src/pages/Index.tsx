@@ -261,6 +261,15 @@ const playHooray = () => {
   } catch {}
 };
 
+const ARCHETYPE_ICONS: Record<keyof typeof ARCHETYPES, string> = {
+  Catalyst: "/lovable-uploads/9ff89498-c379-4513-a683-3697633afaf2.png",
+  Builder: "/lovable-uploads/158a762e-6dab-4a42-9a80-1d6e48cd26b4.png",
+  Explorer: "/lovable-uploads/819c05a6-9725-4939-b7f2-642f95f337aa.png",
+  Guardian: "/lovable-uploads/20db17f9-5bdf-43bd-b628-fd11a7c635ce.png",
+  Dreamer: "/lovable-uploads/7cb42ed8-be02-45f7-9389-b8fcafe66458.png",
+  Gambler: "/lovable-uploads/6a0baa25-c88a-4a62-81ad-4320468afe8a.png",
+};
+
 const Index = () => {
   useSEO();
   const [step, setStep] = useState(0);
@@ -336,8 +345,17 @@ const Index = () => {
         ) : (
           <Card className="mt-4 animate-enter">
             <CardHeader>
-              <CardTitle className="text-xl">
-                You are... {archetype}!
+              <CardTitle className="text-xl flex items-center gap-2">
+                {archetype && (
+                  <img
+                    src={ARCHETYPE_ICONS[archetype]}
+                    alt={`${archetype} icon`}
+                    className="h-7 w-7 object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                )}
+                <span>You are... {archetype}!</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">

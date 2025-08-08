@@ -83,7 +83,7 @@ export async function fetchNews(params: {
   const topicsLine = params.topics.length ? `Focus on these topics when relevant: ${params.topics.join(", ")}.` : "";
 
   const body = {
-    model: "llama-3.1-sonar-small-128k-online",
+    model: "sonar-small-online",
     temperature: 0.2,
     top_p: 0.9,
     max_tokens: 1200,
@@ -143,7 +143,7 @@ export async function summarizeUrl(params: {
   if (!apiKey) throw new Error("Missing Perplexity API key");
 
   const body = {
-    model: "llama-3.1-sonar-small-128k-online",
+    model: "sonar-small-online",
     temperature: 0.2,
     top_p: 0.9,
     max_tokens: 900,

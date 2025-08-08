@@ -29,7 +29,7 @@ function setCache(key: string, value: NewsResult) {
   } catch {}
 }
 
-export const NewsPanel: React.FC<{ archetype: string }> = ({ archetype }) => {
+export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> = ({ archetype, showFilters = true }) => {
   const [openKey, setOpenKey] = useState(false);
   const [timeRange, setTimeRange] = useState<TimeRange>("24h");
   const [topicsText, setTopicsText] = useState("");
@@ -121,26 +121,28 @@ export const NewsPanel: React.FC<{ archetype: string }> = ({ archetype }) => {
             </div>
           )}
 
-          <div className="grid sm:grid-cols-3 gap-3">
-            <div className="sm:col-span-1">
-              <label className="text-sm" htmlFor="time-range">Time range</label>
-              <Select value={timeRange} onValueChange={(v) => setTimeRange(v as TimeRange)}>
-                <SelectTrigger id="time-range" className="mt-1">
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="24h">Last 24 hours</SelectItem>
-                  <SelectItem value="72h">Last 72 hours</SelectItem>
-                  <SelectItem value="week">Last week</SelectItem>
-                  <SelectItem value="month">Last month</SelectItem>
-                </SelectContent>
-              </Select>
+          {showFilters && (
+            <div className="grid sm:grid-cols-3 gap-3">
+              <div className="sm:col-span-1">
+                <label className="text-sm" htmlFor="time-range">Time range</label>
+                <Select value={timeRange} onValueChange={(v) => setTimeRange(v as TimeRange)}>
+                  <SelectTrigger id="time-range" className="mt-1">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="24h">Last 24 hours</SelectItem>
+                    <SelectItem value="72h">Last 72 hours</SelectItem>
+                    <SelectItem value="week">Last week</SelectItem>
+                    <SelectItem value="month">Last month</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-sm" htmlFor="topics">Focus topics (comma separated)</label>
+                <Input id="topics" className="mt-1" placeholder="BTC, ETH, AI, DePIN" value={topicsText} onChange={(e) => setTopicsText(e.target.value)} />
+              </div>
             </div>
-            <div className="sm:col-span-2">
-              <label className="text-sm" htmlFor="topics">Focus topics (comma separated)</label>
-              <Input id="topics" className="mt-1" placeholder="BTC, ETH, AI, DePIN" value={topicsText} onChange={(e) => setTopicsText(e.target.value)} />
-            </div>
-          </div>
+          )}
 
           <div className="flex flex-wrap gap-2">
             <Button onClick={onScan} disabled={loading}>{loading ? "Scanning..." : "Scan news"}</Button>

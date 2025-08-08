@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { ArchetypeGuide } from "@/components/ArchetypeGuide";
-import { NewsPanel } from "@/components/NewsPanel";
+import { Link } from "react-router-dom";
 // SEO
 const useSEO = () => {
   useEffect(() => {
@@ -396,7 +396,11 @@ const Index = () => {
               {archetype && (
                 <>
                   <ArchetypeGuide archetype={archetype} />
-                  <NewsPanel archetype={archetype} />
+                  <div className="flex gap-2">
+                    <Button asChild>
+                      <Link to={`/news?archetype=${encodeURIComponent(archetype)}`}>View tailored news</Link>
+                    </Button>
+                  </div>
                 </>
               )}
               <div className="grid gap-2 sm:grid-cols-2">

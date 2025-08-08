@@ -52,23 +52,50 @@ const mapRecency = (range: TimeRange): "day" | "week" | "month" => {
 
 function extractJson(content: string): any {
   const trimmed = content.trim();
-  const fence = /```\s*json([\s\S]*?)```/i;
-  const m = trimmed.match(fence);
-  const raw = m ? m[1] : trimmed;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    // try to find first { ... }
-    const start = raw.indexOf("{");
-    const end = raw.lastIndexOf("}");
-    if (start !== -1 && end !== -1 && end > start) {
-      const maybe = raw.slice(start, end + 1);
-      try {
-        return JSON.parse(maybe);
-      } catch {}
-    }
-    throw new Error("Failed to parse JSON from model response");
+
+  // 1) If it's already a bare JSON object
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+    try {
+      return JSON.parse(trimmed);
+    } catch {}
   }
+
+  // 2) Any fenced code block (with or without a language tag)
+  const anyFence = /```[a-zA-Z0-9_-]*\n([\s\S]*?)```/m;
+  const fm = trimmed.match(anyFence);
+  const rawFromFence = fm ? fm[1] : trimmed;
+
+  // 3) Try direct JSON parse
+  try {
+    return JSON.parse(rawFromFence);
+  } catch {}
+
+  // 4) Extract the first outer object by braces
+  const start = rawFromFence.indexOf("{");
+  const end = rawFromFence.lastIndexOf("}");
+  if (start !== -1 && end !== -1 && end > start) {
+    const slice = rawFromFence.slice(start, end + 1);
+    try {
+      return JSON.parse(slice);
+    } catch {}
+  }
+
+  // 5) Heuristic: repair common JSON5-like output (single quotes, unquoted keys)
+  try {
+    let repaired = rawFromFence
+      // Quote unquoted keys
+      .replace(/([,{]\s*)([A-Za-z0-9_]+)\s*:/g, '$1"$2":')
+      // Replace single quotes with double quotes
+      .replace(/'([^']*)'/g, '"$1"');
+    const s2 = repaired.indexOf("{");
+    const e2 = repaired.lastIndexOf("}");
+    if (s2 !== -1 && e2 !== -1 && e2 > s2) {
+      repaired = repaired.slice(s2, e2 + 1);
+    }
+    return JSON.parse(repaired);
+  } catch {}
+
+  throw new Error("Failed to parse JSON from model response");
 }
 
 export async function fetchNews(params: {
@@ -96,7 +123,7 @@ export async function fetchNews(params: {
       {
         role: "system",
         content:
-          "You are a precise crypto news analyst. Only return strict JSON with keys: summary (string), articles (array of {title, url, source, publishedAt}). No markdown, no commentary outside JSON.",
+          "You are a precise crypto news analyst. Return a single strict JSON object with keys: summary (string), articles (array of {title, url, source, publishedAt}). Do NOT use code fences. No markdown or commentary.",
       },
       {
         role: "user",

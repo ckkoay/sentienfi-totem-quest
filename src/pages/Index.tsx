@@ -305,7 +305,16 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-primary flex flex-col">
       <header className="px-4 pt-6 pb-2">
-        <h1 className="text-2xl font-bold tracking-tight text-primary">SentienFi Totem</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-primary">
+          <img
+            src="/lovable-uploads/6bf1d443-4b7b-4bdb-87ad-38e244fa032a.png"
+            alt="SentienFi Totem logo - crypto archetype quiz"
+            className="h-7 w-7"
+            loading="lazy"
+            decoding="async"
+          />
+          <span>SentienFi Totem</span>
+        </h1>
         <p className="text-sm text-muted-foreground">Find your crypto‑investor archetype in 8 quick taps.</p>
       </header>
 

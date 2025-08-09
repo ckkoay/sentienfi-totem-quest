@@ -13,7 +13,7 @@ export interface NewsResult {
   raw?: string;
 }
 
-const API_URL = "/functions/v1/perplexity";
+const API_URL = "https://llisxehwxhrqdqxhwbbb.functions.supabase.co/perplexity";
 const LS_KEY = "perplexity_api_key";
 
 export const getPerplexityApiKey = (): string | null => {

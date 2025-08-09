@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
-import { ApiKeyModal } from "./ApiKeyModal";
-import { fetchNews, summarizeUrl, getPerplexityApiKey, type TimeRange, type NewsResult } from "@/services/perplexity";
+
+import { fetchNews, summarizeUrl, type TimeRange, type NewsResult } from "@/services/perplexity";
 import { format } from "date-fns";
 const CACHE_PREFIX = "news_cache_v1:";
 const TTL_MS = 10 * 60 * 1000; // 10 minutes
@@ -30,7 +30,7 @@ function setCache(key: string, value: NewsResult) {
 }
 
 export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> = ({ archetype, showFilters = true }) => {
-  const [openKey, setOpenKey] = useState(false);
+  
   const [timeRange, setTimeRange] = useState<TimeRange>("24h");
   const [topicsText, setTopicsText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
   const [url, setUrl] = useState("");
   const [urlLoading, setUrlLoading] = useState(false);
 
-  const apiKeyPresent = !!getPerplexityApiKey();
+  
 
   const curatedAt = useMemo(() => format(new Date(), "HH:mm dd-MMM-yy"), []);
 
@@ -61,11 +61,6 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
   );
 
   const onScan = async () => {
-    if (!getPerplexityApiKey()) {
-      setOpenKey(true);
-      toast({ title: "Perplexity key required", description: "Add your API key to scan news." });
-      return;
-    }
     const cached = getCache(cacheKey);
     if (cached) {
       setResult(cached);
@@ -85,11 +80,6 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
 
   const onSummarizeUrl = async () => {
     if (!url) return;
-    if (!getPerplexityApiKey()) {
-      setOpenKey(true);
-      toast({ title: "Perplexity key required", description: "Add your API key to summarize URLs." });
-      return;
-    }
     setUrlLoading(true);
     try {
       const res = await summarizeUrl({ archetype, url });
@@ -102,8 +92,8 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
   };
 
   useEffect(() => {
-    // Auto-scan on mount if key exists
-    if (apiKeyPresent && !result) {
+    // Auto-scan on mount
+    if (!result) {
       onScan();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -117,12 +107,6 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
           <p className="text-sm text-muted-foreground">Curated at {curatedAt}</p>
         </CardHeader>
         <CardContent className="grid gap-4">
-          {!apiKeyPresent && (
-            <div className="rounded-md border p-3 text-sm flex items-center justify-between">
-              <p className="text-muted-foreground">Add your Perplexity API key to enable web scanning.</p>
-              <Button variant="outline" onClick={() => setOpenKey(true)}>Add API key</Button>
-            </div>
-          )}
 
           {showFilters && (
             <div className="grid sm:grid-cols-3 gap-3">
@@ -149,7 +133,6 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
 
           <div className="flex flex-wrap gap-2">
             <Button onClick={onScan} disabled={loading}>{loading ? "Scanning..." : "Scan news"}</Button>
-            <Button variant="secondary" onClick={() => setOpenKey(true)}>API key</Button>
           </div>
 
           {loading && (
@@ -207,7 +190,6 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
         </CardContent>
       </Card>
 
-      <ApiKeyModal open={openKey} onClose={() => setOpenKey(false)} onSaved={() => toast({ title: "API key saved" })} />
     </section>
   );
 };

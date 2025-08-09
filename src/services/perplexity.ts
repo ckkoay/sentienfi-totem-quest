@@ -13,7 +13,7 @@ export interface NewsResult {
   raw?: string;
 }
 
-const API_URL = "https://api.perplexity.ai/chat/completions";
+const API_URL = "/functions/v1/perplexity";
 const LS_KEY = "perplexity_api_key";
 
 export const getPerplexityApiKey = (): string | null => {
@@ -104,9 +104,6 @@ export async function fetchNews(params: {
   topics: string[];
   apiKey?: string;
 }): Promise<NewsResult> {
-  const apiKey = params.apiKey ?? getPerplexityApiKey();
-  if (!apiKey) throw new Error("Missing Perplexity API key");
-
   const topicsLine = params.topics.length ? `Focus on these topics when relevant: ${params.topics.join(", ")}.` : "";
 
   const body = {
@@ -135,8 +132,7 @@ export async function fetchNews(params: {
 
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
+  headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
@@ -166,9 +162,6 @@ export async function summarizeUrl(params: {
   url: string;
   apiKey?: string;
 }): Promise<{ summary: string; raw?: string }> {
-  const apiKey = params.apiKey ?? getPerplexityApiKey();
-  if (!apiKey) throw new Error("Missing Perplexity API key");
-
   const body = {
     model: "sonar-pro",
     temperature: 0.2,
@@ -194,8 +187,7 @@ export async function summarizeUrl(params: {
 
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
+  headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),

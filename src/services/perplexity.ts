@@ -51,10 +51,21 @@ const mapRecency = (range: TimeRange): "day" | "week" | "month" => {
 };
 
 function extractJson(content: string): any {
-  const trimmed = content.trim();
+  // Sanitize common model quirks first
+  const sanitize = (s: string) =>
+    s
+      // replace smart quotes
+      .replace(/[\u201C\u201D]/g, '"')
+      .replace(/[\u2018\u2019]/g, "'")
+      // remove zero-width / non-breaking spaces
+      .replace(/[\u200B\u00A0]/g, ' ')
+      // remove trailing commas before closing braces/brackets
+      .replace(/,(\s*[}\]])/g, '$1');
+
+  let trimmed = sanitize(content.trim());
 
   // 1) If it's already a bare JSON object
-  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
     try {
       return JSON.parse(trimmed);
     } catch {}
@@ -63,7 +74,7 @@ function extractJson(content: string): any {
   // 2) Any fenced code block (with or without a language tag)
   const anyFence = /```[a-zA-Z0-9_-]*\n([\s\S]*?)```/m;
   const fm = trimmed.match(anyFence);
-  const rawFromFence = fm ? fm[1] : trimmed;
+  let rawFromFence = fm ? sanitize(fm[1]) : trimmed;
 
   // 3) Try direct JSON parse
   try {
@@ -71,10 +82,10 @@ function extractJson(content: string): any {
   } catch {}
 
   // 4) Extract the first outer object by braces
-  const start = rawFromFence.indexOf("{");
-  const end = rawFromFence.lastIndexOf("}");
+  const start = rawFromFence.indexOf('{');
+  const end = rawFromFence.lastIndexOf('}');
   if (start !== -1 && end !== -1 && end > start) {
-    const slice = rawFromFence.slice(start, end + 1);
+    const slice = sanitize(rawFromFence.slice(start, end + 1));
     try {
       return JSON.parse(slice);
     } catch {}
@@ -85,17 +96,19 @@ function extractJson(content: string): any {
     let repaired = rawFromFence
       // Quote unquoted keys
       .replace(/([,{]\s*)([A-Za-z0-9_]+)\s*:/g, '$1"$2":')
-      // Replace single quotes with double quotes
+      // Replace single quotes with double quotes for values
       .replace(/'([^']*)'/g, '"$1"');
-    const s2 = repaired.indexOf("{");
-    const e2 = repaired.lastIndexOf("}");
+
+    const s2 = repaired.indexOf('{');
+    const e2 = repaired.lastIndexOf('}');
     if (s2 !== -1 && e2 !== -1 && e2 > s2) {
       repaired = repaired.slice(s2, e2 + 1);
     }
+    repaired = sanitize(repaired);
     return JSON.parse(repaired);
   } catch {}
 
-  throw new Error("Failed to parse JSON from model response");
+  throw new Error('Failed to parse JSON from model response');
 }
 
 export async function fetchNews(params: {
@@ -146,10 +159,23 @@ export async function fetchNews(params: {
   const data = await res.json();
   const content: string = data?.choices?.[0]?.message?.content ?? "";
   try {
-    const parsed = extractJson(content) as NewsResult;
+    const parsed = extractJson(content) as any;
+    const articles = Array.isArray(parsed?.articles)
+      ? parsed.articles
+          .filter((a: any) => a && typeof a.title === "string" && typeof a.url === "string")
+          .map((a: any) => ({
+            title: String(a.title).trim(),
+            url: String(a.url).trim(),
+            source: a.source ? String(a.source).trim() : undefined,
+            publishedAt:
+              typeof a.publishedAt === "string" && !Number.isNaN(Date.parse(a.publishedAt))
+                ? a.publishedAt
+                : undefined,
+          }))
+      : [];
     return {
-      summary: parsed.summary ?? "",
-      articles: Array.isArray(parsed.articles) ? parsed.articles : [],
+      summary: parsed?.summary ?? "",
+      articles,
       raw: content,
     };
   } catch {

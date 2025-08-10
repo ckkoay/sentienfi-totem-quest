@@ -40,6 +40,20 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
 
   
 
+  const normalizeUrl = (u: string) => {
+    if (!u) return "#";
+    const hasProtocol = /^https?:\/\//i.test(u);
+    return hasProtocol ? u : `https://${u}`;
+  };
+
+  const safeHostname = (u: string) => {
+    try {
+      return new URL(normalizeUrl(u)).hostname;
+    } catch {
+      return "";
+    }
+  };
+
   const curatedAt = useMemo(() => format(new Date(), "HH:mm dd-MMM-yy"), []);
 
   const cacheKey = useMemo(() => {
@@ -159,7 +173,7 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
                     {result.articles.map((a, i) => (
                       <a
                         key={i}
-                        href={a.url}
+                        href={normalizeUrl(a.url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="rounded-md border p-3 hover:bg-accent/50 transition-colors"
@@ -167,8 +181,8 @@ export const NewsPanel: React.FC<{ archetype: string; showFilters?: boolean }> =
                       >
                         <div className="font-medium line-clamp-2">{a.title}</div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          {a.source ? a.source : new URL(a.url).hostname}
-                          {a.publishedAt ? ` · ${new Date(a.publishedAt).toLocaleString()}` : null}
+                          {a.source ? a.source : safeHostname(a.url)}
+                          {a.publishedAt && !Number.isNaN(Date.parse(a.publishedAt)) ? ` · ${new Date(a.publishedAt).toLocaleString()}` : null}
                         </div>
                       </a>
                     ))}
